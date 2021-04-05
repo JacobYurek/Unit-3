@@ -1,0 +1,8 @@
+components
+build
+node_modules
+docs/public/
+.nyc_output
+dist
+types.js
+*.types.js
