@@ -26,8 +26,8 @@ function setMap(){
 
         //add enumeration units to the map
         setEnumerationUnits(states, map, path, colorScale);
-        setChart(csvData, colorScale)
-
+        setChart(csvData, colorScale);
+        createDropdown(csvData);
      };
 
     //map frame dimensions
@@ -120,7 +120,7 @@ function setChart(csvData, colorScale){
         .attr("x", 150)
         .attr("y", 40)
         .attr("class", "chartTitle")
-        .text("Amount of Burned Forest " + expressed + " in each region");
+        .text("Amount of Burned Forest " + expressed + " in each state");
 
     //create vertical axis generator
     var yAxis = d3.axisLeft()
@@ -223,7 +223,7 @@ function makeColorScale(data){
     //build array of all values of the expressed attribute
     var domainArray = [];
     for (var i=0; i<data.length; i++){
-        //console.log(data2[i]['properties'][expressed])
+        
         var val = parseFloat(data[i][expressed]);
         domainArray.push(val);
     };
@@ -242,6 +242,48 @@ function makeColorScale(data){
 
     return colorScale;
 };
+function createDropdown(csvData){
+    //add select element
+    var dropdown = d3.select("body")
+        .append("select")
+        .attr("class", "dropdown")
+        .on("change", function(){
+            changeAttribute(this.value, csvData)
+        });
+
+    //add initial option
+    var titleOption = dropdown.append("option")
+        .attr("class", "titleOption")
+        .attr("disabled", "true")
+        .text("Select Attribute");
+
+    //add attribute name options
+    var attrOptions = dropdown.selectAll("attrOptions")
+        .data(attrArray)
+        .enter()
+        .append("option")
+        .attr("value", function(d){ return d })
+        .text(function(d){ return d });
+};
+function changeAttribute(attribute, csvData) {
+    //change the expressed attribute
+    expressed = attribute;
+
+    //recreate the color scale
+    var colorScale = makeColorScale(csvData);
+    console.log("hell")
+    //recolor enumeration units
+    var states = d3.selectAll(".mystates").style("fill", function (d) {
+        var value = d.properties[expressed];
+        console.log("hell")
+        if (value) {
+            console.log("hell")
+            return colorScale(d.properties[expressed]);
+        } else {
+            return "#ccc";
+        }
+    });
+}
 
 })(); //last line of main.js
 
